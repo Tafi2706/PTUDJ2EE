@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{_layout}">
+
+<head>
+    <title>Danh sách sách</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+
+        <div class="page-title">
+            📖 Danh sách sách
+        </div>
+
+        <div class="card">
+            <!-- Nút Thêm sách -->
+            <div style="margin-bottom: 1.25rem;">
+                <a href="/books/add" class="btn btn-primary">➕ Thêm sách mới</a>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tiêu đề</th>
+                            <th>Tác giả</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(books)}">
+                            <td colspan="4" style="text-align:center; color:#6366f1; padding: 2rem;">
+                                Chưa có sách nào. Hãy thêm sách mới!
+                            </td>
+                        </tr>
+                        <tr th:each="book, stat : ${books}">
+                            <td th:text="${stat.index + 1}">1</td>
+                            <td th:text="${book.title}">Tiêu đề sách</td>
+                            <td th:text="${book.author}">Tác giả</td>
+                            <td>
+                                <a th:href="@{/books/edit/{id}(id=${book.id})}" class="btn btn-warning"
+                                    style="margin-right:0.5rem;">✏️ Sửa</a>
+                                <a th:href="@{/books/delete/{id}(id=${book.id})}" class="btn btn-danger"
+                                    onclick="return confirm('Bạn có chắc muốn xóa sách này?')">🗑️ Xóa</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

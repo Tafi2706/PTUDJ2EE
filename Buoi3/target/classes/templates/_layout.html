@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title layout:title-pattern="$CONTENT_TITLE - Book Manager">Book Manager</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f0f1a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Navbar ── */
+        header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+            border-bottom: 1px solid rgba(99,102,241,0.4);
+        }
+
+        header .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #a5b4fc;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        header .brand span {
+            color: #818cf8;
+        }
+
+        nav a {
+            color: #c7d2fe;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover { color: #a5b4fc; }
+
+        /* ── Main content ── */
+        main {
+            flex: 1;
+            padding: 2.5rem 2rem;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ── Footer ── */
+        footer {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border-top: 1px solid rgba(99,102,241,0.4);
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #818cf8;
+        }
+
+        /* ── Cards / Sections ── */
+        .card {
+            background: rgba(30, 27, 75, 0.6);
+            border: 1px solid rgba(99,102,241,0.25);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* ── Page title ── */
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #a5b4fc;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-block;
+            padding: 0.55rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99,102,241,0.55);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(245,158,11,0.3);
+        }
+
+        .btn-warning:hover { transform: translateY(-2px); }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(239,68,68,0.3);
+        }
+
+        .btn-danger:hover { transform: translateY(-2px); }
+
+        .btn-secondary {
+            background: rgba(100,116,139,0.3);
+            color: #cbd5e1;
+            border: 1px solid rgba(100,116,139,0.5);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(100,116,139,0.5);
+        }
+
+        /* ── Table ── */
+        .table-wrapper { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        thead tr {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+
+        thead th {
+            padding: 0.9rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #e0e7ff;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(99,102,241,0.15);
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover { background: rgba(99,102,241,0.1); }
+
+        tbody td {
+            padding: 0.85rem 1rem;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        /* ── Forms ── */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #a5b4fc;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.65rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(99,102,241,0.35);
+            background: rgba(15,15,26,0.7);
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="/books" class="brand">📚 Book<span>Manager</span></a>
+    <nav>
+        <a href="/books">Tất cả sách</a>
+        <a href="/books/add">➕ Thêm sách</a>
+    </nav>
+</header>
+
+<main>
+    <!-- Content page injects here -->
+    <div layout:fragment="content">
+        <p>Content goes here.</p>
+    </div>
+</main>
+
+<footer>
+    &copy; 2025 BookManager &mdash; Spring Boot + Thymeleaf Layout Dialect
+</footer>
+
+</body>
+</html>
