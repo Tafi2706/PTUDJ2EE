@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{_layout}">
+
+<head>
+    <title>Thêm sản phẩm</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Thêm sản phẩm mới</h4>
+                    </div>
+                    <div class="card-body">
+
+                        <!--
+                        Form thêm sản phẩm:
+                        - th:action trỏ đến POST /products/create
+                        - th:object="*{product}" binding toàn bộ form với đối tượng Product
+                        - enctype="multipart/form-data" BẮTBUỘC để có thể upload file ảnh
+                    -->
+                        <form th:action="@{/products/create}" th:object="${product}" method="post"
+                            enctype="multipart/form-data">
+
+                            <!-- ===== TRƯỜNG TÊN SẢN PHẨM ===== -->
+                            <div class="mb-3">
+                                <label for="name" class="form-label fw-semibold">Tên sản phẩm <span
+                                        class="text-danger">*</span></label>
+                                <!--
+                                th:field="*{name}" tự động binding value, name, id cho input
+                                Tương đương: name="name" th:value="${product.name}"
+                            -->
+                                <input type="text" id="name" class="form-control" th:field="*{name}"
+                                    th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''"
+                                    placeholder="Nhập tên sản phẩm...">
+                                <!--
+                                Hiển thị thông báo lỗi validation nếu trường name có lỗi.
+                                th:if kiểm tra xem có lỗi không, th:errors hiển thị message lỗi.
+                            -->
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+                                </div>
+                            </div>
+
+                            <!-- ===== TRƯỜNG DANH MỤC ===== -->
+                            <div class="mb-3">
+                                <label for="category" class="form-label fw-semibold">Danh mục <span
+                                        class="text-danger">*</span></label>
+                                <!--
+                                Select binding với category.id.
+                                Vì Category là đối tượng phức, ta bind vào category.id rồi
+                                controller sẽ lấy Category đầy đủ từ CategoryService.
+                            -->
+                                <select id="category" name="category.id" class="form-select">
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
+                                        th:selected="${product.category != null and product.category.id == cat.id}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- ===== TRƯỜNG GIÁ SẢN PHẨM ===== -->
+                            <div class="mb-3">
+                                <label for="price" class="form-label fw-semibold">Giá (VNĐ) <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" id="price" class="form-control" th:field="*{price}"
+                                    th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''"
+                                    placeholder="Nhập giá sản phẩm..." min="1" max="9999999">
+                                <!-- Hiển thị lỗi validation cho trường price -->
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('price')}"
+                                    th:errors="*{price}">
+                                </div>
+                            </div>
+
+                            <!-- ===== TRƯỜNG UPLOAD ẢNH ===== -->
+                            <div class="mb-3">
+                                <label for="imageProduct" class="form-label fw-semibold">Hình ảnh sản phẩm</label>
+                                <!--
+                                Upload ảnh:
+                                - name="imageProduct" phải khớp với @RequestParam("imageProduct") trong Controller
+                                - accept="image/*" chỉ cho phép chọn file ảnh
+                                - th:field KHÔNG dùng được với input[type=file], nên dùng name thông thường
+                            -->
+                                <input type="file" id="imageProduct" name="imageProduct" class="form-control"
+                                    th:classappend="${#fields.hasErrors('image')} ? 'is-invalid' : ''" accept="image/*">
+                                <!-- Hiển thị lỗi validation cho trường image (độ dài tên file) -->
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('image')}"
+                                    th:errors="*{image}">
+                                </div>
+                                <div class="form-text text-muted">Chấp nhận: JPG, PNG, GIF, WEBP...</div>
+                            </div>
+
+                            <!-- ===== NÚT SUBMIT ===== -->
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-floppy me-1"></i>Lưu sản phẩm
+                                </button>
+                                <a th:href="@{/products}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i>Hủy
+                                </a>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

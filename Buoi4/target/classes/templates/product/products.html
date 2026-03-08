@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{_layout}">
+
+<head>
+    <title>Danh sách sản phẩm</title>
+</head>
+
+<body>
+
+    <!--/* Nội dung này sẽ được chèn vào layout:fragment="content" trong _layout.html */-->
+    <div layout:fragment="content">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>Danh sách sản phẩm</h2>
+            <!-- Nút tạo sản phẩm mới -->
+            <a th:href="@{/products/create}" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i>Thêm sản phẩm
+            </a>
+        </div>
+
+        <!-- Bảng danh sách sản phẩm -->
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover table-bordered mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Danh mục</th>
+                            <th>Giá (VNĐ)</th>
+                            <th class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Duyệt qua từng sản phẩm trong danh sách -->
+                        <tr th:each="product, stat : ${products}">
+                            <td th:text="${stat.index + 1}"></td>
+                            <td>
+                                <!--
+                                Hiển thị ảnh sản phẩm.
+                                Nếu có tên ảnh, trỏ vào /images/{tên_file} (thư mục static/images).
+                                Nếu không có ảnh, hiển thị ảnh mặc định.
+                            -->
+                                <img th:if="${product.image != null and !product.image.isEmpty()}"
+                                    th:src="@{'/images/' + ${product.image}}" alt="Ảnh sản phẩm"
+                                    style="width: 80px; height: 80px; object-fit: cover;" class="rounded">
+                                <span th:unless="${product.image != null and !product.image.isEmpty()}"
+                                    class="text-muted fst-italic">Chưa có ảnh</span>
+                            </td>
+                            <td th:text="${product.name}"></td>
+                            <td th:text="${product.category != null ? product.category.name : 'Chưa phân loại'}"></td>
+                            <td th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + ' đ'"></td>
+                            <td class="text-center">
+                                <!-- Nút Edit -->
+                                <a th:href="@{/products/edit/{id}(id=${product.id})}"
+                                    class="btn btn-warning btn-sm me-1">
+                                    <i class="bi bi-pencil-square"></i> Sửa
+                                </a>
+                                <!-- Nút Delete (chưa implement backend, disabled) -->
+                                <button class="btn btn-danger btn-sm" disabled>
+                                    <i class="bi bi-trash3"></i> Xóa
+                                </button>
+                            </td>
+                        </tr>
+                        <!-- Hiển thị khi danh sách trống -->
+                        <tr th:if="${#lists.isEmpty(products)}">
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Chưa có sản phẩm nào. <a th:href="@{/products/create}">Thêm ngay!</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

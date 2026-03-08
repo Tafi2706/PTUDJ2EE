@@ -1,0 +1,5 @@
+com\example\demo\service\ProductService.class
+com\example\demo\model\Product.class
+com\example\demo\model\Category.class
+com\example\demo\service\CategoryService.class
+com\example\demo\controller\ProductController.class
