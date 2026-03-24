@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${doctor.id != null} ? 'Chỉnh sửa Bác sĩ' : 'Thêm Bác sĩ'">Form Bác sĩ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root {
+            --primary:#2563eb; --primary-dark:#1d4ed8; --primary-light:#eff6ff;
+            --bg:#f0f4ff; --card:#fff; --text:#1e293b; --muted:#64748b;
+            --border:#e2e8f0; --shadow:0 4px 24px rgba(37,99,235,0.10);
+            --radius:16px; --navbar-h:64px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
+
+        /* NAVBAR */
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--navbar-h);background:rgba(255,255,255,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 36px;box-shadow:0 2px 12px rgba(37,99,235,0.07);}
+        .navbar-brand{font-size:1.15rem;font-weight:700;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:8px;}
+        .nav-link{padding:7px 16px;border-radius:8px;text-decoration:none;color:var(--muted);font-weight:500;font-size:0.88rem;transition:all 0.2s;}
+        .nav-link:hover{background:var(--primary-light);color:var(--primary);}
+
+        /* MAIN */
+        .main{padding-top:calc(var(--navbar-h)+40px);padding-bottom:60px;display:flex;justify-content:center;padding-left:16px;padding-right:16px;}
+
+        /* CARD */
+        .form-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);width:100%;max-width:600px;overflow:hidden;}
+        .form-header{background:linear-gradient(135deg,#1e40af,#2563eb,#06b6d4);padding:28px 32px;}
+        .form-header h2{color:#fff;font-size:1.3rem;font-weight:700;}
+        .form-header p{color:rgba(255,255,255,0.75);font-size:0.88rem;margin-top:4px;}
+        .form-body{padding:32px;}
+
+        /* FORM ELEMENTS */
+        .form-group{margin-bottom:20px;}
+        label{display:block;font-weight:600;font-size:0.83rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:7px;}
+        .input-wrap{position:relative;}
+        .input-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:0.88rem;}
+        input[type=text], input[type=url], select{
+            width:100%;padding:11px 14px 11px 38px;
+            border:1.5px solid var(--border);border-radius:10px;
+            font-size:0.92rem;font-family:'Inter',sans-serif;
+            background:#fff;color:var(--text);outline:none;
+            transition:border-color 0.2s,box-shadow 0.2s;
+        }
+        select{padding-left:38px;}
+        input[type=text]:focus, input[type=url]:focus, select:focus{
+            border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.12);
+        }
+
+        /* IMAGE PREVIEW */
+        .img-preview-wrap{margin-top:10px;display:flex;align-items:center;gap:12px;}
+        .img-preview{width:72px;height:72px;border-radius:10px;object-fit:cover;object-position:top;border:2px solid var(--border);background:#f1f5f9;}
+
+        /* BUTTONS */
+        .form-actions{display:flex;gap:12px;margin-top:8px;}
+        .btn-save{flex:1;padding:13px;background:linear-gradient(135deg,var(--primary),#06b6d4);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity 0.2s;}
+        .btn-save:hover{opacity:0.88;}
+        .btn-cancel{flex:1;padding:13px;background:#f1f5f9;color:var(--muted);border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;text-decoration:none;text-align:center;transition:background 0.2s;}
+        .btn-cancel:hover{background:#e2e8f0;color:var(--text);}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/home}">
+        <i class="fa-solid fa-stethoscope"></i> ClinicCare
+        <span style="font-size:0.7rem;background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:10px;">ADMIN</span>
+    </a>
+    <a class="nav-link" th:href="@{/admin/doctors}">
+        <i class="fa fa-arrow-left"></i> Quay lại danh sách
+    </a>
+</nav>
+
+<div class="main">
+    <div class="form-card">
+        <div class="form-header">
+            <h2 th:text="${doctor.id != null} ? '✏️ Chỉnh sửa Bác sĩ' : '➕ Thêm Bác sĩ Mới'"></h2>
+            <p th:text="${doctor.id != null} ? 'Cập nhật thông tin bác sĩ' : 'Điền thông tin bác sĩ mới vào hệ thống'"></p>
+        </div>
+        <div class="form-body">
+            <form th:action="${doctor.id != null} ? @{/admin/doctors/edit/{id}(id=${doctor.id})} : @{/admin/doctors/create}"
+                  th:object="${doctor}" method="post">
+
+                <!-- Tên bác sĩ -->
+                <div class="form-group">
+                    <label for="name">Tên bác sĩ</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-user-doctor"></i>
+                        <input type="text" id="name" th:field="*{name}" placeholder="VD: BS. Nguyễn Văn An" required/>
+                    </div>
+                </div>
+
+                <!-- Chuyên khoa -->
+                <div class="form-group">
+                    <label for="specialty">Chuyên khoa</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-stethoscope"></i>
+                        <input type="text" id="specialty" th:field="*{specialty}" placeholder="VD: Tim mạch can thiệp"/>
+                    </div>
+                </div>
+
+                <!-- Khoa (Department) -->
+                <div class="form-group">
+                    <label for="department">Khoa</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-hospital"></i>
+                        <select id="department" name="department.id" required>
+                            <option value="">-- Chọn khoa --</option>
+                            <option th:each="dept : ${departments}"
+                                    th:value="${dept.id}"
+                                    th:text="${dept.name}"
+                                    th:selected="${doctor.department != null and doctor.department.id == dept.id}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- URL ảnh -->
+                <div class="form-group">
+                    <label for="image">URL ảnh</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-image"></i>
+                        <input type="url" id="image" th:field="*{image}"
+                               placeholder="https://example.com/image.jpg"
+                               oninput="previewImg(this.value)"/>
+                    </div>
+                    <div class="img-preview-wrap">
+                        <img class="img-preview" id="imgPreview"
+                             th:src="${doctor.image != null and !doctor.image.isEmpty()} ? ${doctor.image} : 'https://i.pravatar.cc/100?u=new'"
+                             alt="Preview"/>
+                        <span style="font-size:0.8rem;color:var(--muted)">Xem trước ảnh</span>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">
+                        <i class="fa fa-floppy-disk"></i>
+                        <span th:text="${doctor.id != null} ? 'Cập nhật' : 'Lưu bác sĩ'"></span>
+                    </button>
+                    <a class="btn-cancel" th:href="@{/admin/doctors}">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewImg(url) {
+        const img = document.getElementById('imgPreview');
+        img.src = url || 'https://i.pravatar.cc/100?u=new';
+        img.onerror = function () { this.src = 'https://i.pravatar.cc/100?u=new'; };
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Clinic Appointment - Trang chủ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --accent: #06b6d4;
+            --bg: #f0f4ff;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 20px rgba(37,99,235,0.08);
+            --shadow-hover: 0 12px 40px rgba(37,99,235,0.18);
+            --radius: 16px;
+            --navbar-h: 68px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: var(--navbar-h);
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px;
+            box-shadow: 0 2px 16px rgba(37,99,235,0.06);
+        }
+        .navbar-brand {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.25rem; font-weight: 700; color: var(--primary);
+            text-decoration: none;
+        }
+        .navbar-brand i { font-size: 1.4rem; color: var(--accent); }
+        .navbar-links { display: flex; align-items: center; gap: 8px; }
+        .nav-link {
+            padding: 8px 18px; border-radius: 8px;
+            text-decoration: none; font-weight: 500; font-size: 0.9rem;
+            color: var(--text-muted); transition: all 0.2s;
+        }
+        .nav-link:hover { background: var(--primary-light); color: var(--primary); }
+        .btn-nav {
+            padding: 8px 20px; border-radius: 8px;
+            font-weight: 600; font-size: 0.9rem; cursor: pointer;
+            border: none; transition: all 0.2s; text-decoration: none;
+        }
+        .btn-login { background: var(--primary-light); color: var(--primary); }
+        .btn-login:hover { background: var(--primary); color: #fff; }
+        .btn-logout { background: #fee2e2; color: #dc2626; }
+        .btn-logout:hover { background: #dc2626; color: #fff; }
+        .badge-role {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
+            background: var(--primary); color: #fff; margin-left: 6px;
+        }
+
+        /* ── MAIN WRAP ── */
+        .main-wrap {
+            padding-top: calc(var(--navbar-h) + 32px);
+            padding-bottom: 60px;
+        }
+
+        /* ── HERO SEARCH ── */
+        .hero {
+            background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 60%, #06b6d4 100%);
+            padding: 56px 40px 48px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .hero h1 { font-size: 2.2rem; font-weight: 700; color: #fff; margin-bottom: 10px; position: relative; }
+        .hero p { color: rgba(255,255,255,0.8); font-size: 1.05rem; margin-bottom: 28px; position: relative; }
+        .search-bar {
+            display: flex; max-width: 520px; margin: 0 auto;
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            overflow: hidden; position: relative;
+        }
+        .search-bar input {
+            flex: 1; border: none; outline: none; padding: 14px 20px;
+            font-size: 0.95rem; font-family: 'Inter', sans-serif;
+        }
+        .search-bar button {
+            padding: 0 24px; background: var(--primary); color: #fff;
+            border: none; cursor: pointer; font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .search-bar button:hover { background: var(--primary-dark); }
+
+        /* ── CONTENT ── */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+        .section-head {
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 36px 0 20px;
+        }
+        .section-head h2 { font-size: 1.35rem; font-weight: 700; color: var(--text); }
+        .count-badge {
+            background: var(--primary-light); color: var(--primary);
+            padding: 5px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+        }
+
+        /* ── DOCTOR GRID ── */
+        .doctor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 20px;
+        }
+
+        .doctor-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.25s, box-shadow 0.25s;
+            display: flex; flex-direction: column;
+        }
+        .doctor-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+        }
+        .card-img-wrap {
+            position: relative; height: 200px; overflow: hidden;
+            background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+        }
+        .card-img-wrap img {
+            width: 100%; height: 100%; object-fit: cover; object-position: top center;
+            transition: transform 0.4s;
+        }
+        .doctor-card:hover .card-img-wrap img { transform: scale(1.06); }
+        .card-dept-badge {
+            position: absolute; bottom: 10px; left: 10px;
+            background: rgba(37,99,235,0.88); color: #fff;
+            padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+            backdrop-filter: blur(4px);
+        }
+        .card-body { padding: 16px 18px 20px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .card-body h3 { font-size: 1rem; font-weight: 700; color: var(--text); line-height: 1.3; }
+        .speciality-tag {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: var(--primary-light); color: var(--primary);
+            padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+            width: fit-content;
+        }
+        .card-footer-actions { margin-top: auto; padding-top: 12px; }
+        .btn-book {
+            display: block; width: 100%; padding: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff; border: none; border-radius: 9px;
+            font-weight: 600; font-size: 0.88rem;
+            cursor: pointer; text-align: center; text-decoration: none;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .btn-book:hover { opacity: 0.88; transform: scale(0.98); }
+        .btn-book-disabled {
+            display: block; width: 100%; padding: 10px;
+            background: #f1f5f9; color: var(--text-muted);
+            border: 1px dashed var(--border); border-radius: 9px;
+            font-weight: 500; font-size: 0.85rem; text-align: center;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center; padding: 64px 0;
+        }
+        .empty-state i { font-size: 4rem; color: #cbd5e1; margin-bottom: 16px; }
+        .empty-state p { color: var(--text-muted); font-size: 1.05rem; }
+
+        /* ── PAGINATION ── */
+        .pagination-wrap {
+            display: flex; justify-content: center; align-items: center;
+            gap: 8px; margin-top: 40px;
+        }
+        .page-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; border-radius: 10px;
+            font-weight: 600; font-size: 0.9rem; text-decoration: none;
+            border: 1.5px solid var(--border); color: var(--text-muted);
+            background: #fff; transition: all 0.2s;
+        }
+        .page-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .page-btn.disabled { pointer-events: none; opacity: 0.4; }
+        .page-ellipsis { color: var(--text-muted); padding: 0 4px; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .hero { padding: 44px 20px 36px; }
+            .hero h1 { font-size: 1.6rem; }
+            .doctor-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+        }
+        @media (max-width: 480px) {
+            .doctor-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/home}">
+        <i class="fa-solid fa-stethoscope"></i> ClinicCare
+    </a>
+    <div class="navbar-links">
+        <a class="nav-link" th:href="@{/home}"><i class="fa fa-home"></i> Trang chủ</a>
+
+        <!-- Khi chưa đăng nhập -->
+        <a class="btn-nav btn-login" th:href="@{/login}" sec:authorize="isAnonymous()">
+            <i class="fa fa-right-to-bracket"></i> Đăng nhập
+        </a>
+        <a class="nav-link" th:href="@{/register}" sec:authorize="isAnonymous()">Đăng ký</a>
+
+        <!-- Khi đã đăng nhập -->
+        <span sec:authorize="isAuthenticated()">
+            <a class="nav-link" th:href="@{/appointments/my}">
+                <i class="fa fa-calendar-check"></i> Lịch của tôi
+            </a>
+            <a class="nav-link" th:href="@{/admin/doctors}" sec:authorize="hasRole('ADMIN')">
+                <i class="fa fa-user-doctor"></i> Quản lý BS
+            </a>
+            <form th:action="@{/logout}" method="post" style="display:inline">
+                <button class="btn-nav btn-logout" type="submit">
+                    <i class="fa fa-right-from-bracket"></i> Đăng xuất
+                </button>
+            </form>
+        </span>
+    </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+    <!-- HERO / SEARCH -->
+    <div class="hero">
+        <h1><i class="fa-solid fa-hospital-user"></i> Đặt lịch khám bệnh trực tuyến</h1>
+        <p>Tìm kiếm bác sĩ phù hợp và đặt lịch chỉ trong vài giây</p>
+        <form th:action="@{/home}" method="get" class="search-bar" id="searchForm">
+            <input type="text" name="keyword" id="searchInput"
+                   th:value="${keyword}"
+                   placeholder="Tìm kiếm theo tên bác sĩ..."/>
+            <button type="submit" id="searchBtn"><i class="fa fa-search"></i></button>
+        </form>
+    </div>
+
+    <div class="container">
+        <!-- SECTION HEADER -->
+        <div class="section-head">
+            <h2>
+                <span th:if="${keyword != null and !keyword.isEmpty()}">
+                    Kết quả tìm kiếm: "<span th:text="${keyword}"></span>"
+                </span>
+                <span th:unless="${keyword != null and !keyword.isEmpty()}">
+                    Danh sách bác sĩ
+                </span>
+            </h2>
+            <span class="count-badge"
+                  th:text="${doctorPage.totalElements} + ' bác sĩ'"></span>
+        </div>
+
+        <!-- DOCTOR GRID -->
+        <div class="doctor-grid" th:if="${doctorPage.content.size() > 0}">
+            <div class="doctor-card" th:each="doctor : ${doctorPage.content}">
+                <div class="card-img-wrap">
+                    <img th:src="${doctor.image != null and !doctor.image.isEmpty()} ? ${doctor.image} : 'https://i.pravatar.cc/300?u=' + ${doctor.id}"
+                         th:alt="${doctor.name}" loading="lazy"/>
+                    <span class="card-dept-badge"
+                          th:text="${doctor.department != null} ? ${doctor.department.name} : 'Chưa phân khoa'"></span>
+                </div>
+                <div class="card-body">
+                    <h3 th:text="${doctor.name}">Tên bác sĩ</h3>
+                    <span class="speciality-tag">
+                        <i class="fa-solid fa-user-doctor"></i>
+                        <span th:text="${doctor.specialty != null} ? ${doctor.specialty} : 'Chưa có thông tin'"></span>
+                    </span>
+                    <div class="card-footer-actions">
+                        <!-- Đã đăng nhập và là PATIENT -->
+                        <a class="btn-book"
+                           th:href="@{/enroll(doctorId=${doctor.id})}"
+                           sec:authorize="hasRole('PATIENT')">
+                            <i class="fa fa-calendar-plus"></i> Đặt lịch
+                        </a>
+                        <!-- Chưa đăng nhập -->
+                        <a class="btn-book"
+                           th:href="@{/login}"
+                           sec:authorize="isAnonymous()">
+                            <i class="fa fa-lock"></i> Đăng nhập để đặt lịch
+                        </a>
+                        <!-- Là ADMIN -->
+                        <span class="btn-book-disabled" sec:authorize="hasRole('ADMIN')">
+                            <i class="fa fa-shield-halved"></i> ADMIN không đặt lịch
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div class="empty-state" th:if="${doctorPage.content.size() == 0}">
+            <i class="fa-solid fa-user-slash"></i>
+            <p>Không tìm thấy bác sĩ nào phù hợp.</p>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination-wrap" th:if="${totalPages > 1}">
+            <!-- Prev -->
+            <a class="page-btn"
+               th:classappend="${currentPage == 0} ? 'disabled'"
+               th:href="@{/home(page=${currentPage - 1}, keyword=${keyword})}">
+                <i class="fa fa-chevron-left"></i>
+            </a>
+
+            <!-- Page numbers -->
+            <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a class="page-btn"
+                   th:classappend="${i == currentPage} ? 'active'"
+                   th:href="@{/home(page=${i}, keyword=${keyword})}"
+                   th:text="${i + 1}">1</a>
+            </th:block>
+
+            <!-- Next -->
+            <a class="page-btn"
+               th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
+               th:href="@{/home(page=${currentPage + 1}, keyword=${keyword})}">
+                <i class="fa fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

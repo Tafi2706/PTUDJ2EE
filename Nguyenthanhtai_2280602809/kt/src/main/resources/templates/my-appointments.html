@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Lịch của tôi - ClinicCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root{--primary:#2563eb;--primary-light:#eff6ff;--bg:#f0f4ff;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--shadow:0 4px 20px rgba(37,99,235,.08);--radius:14px;--navbar-h:64px;}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
+
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--navbar-h);background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 36px;box-shadow:0 2px 12px rgba(37,99,235,.07);}
+        .navbar-brand{font-size:1.15rem;font-weight:700;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:8px;}
+        .nav-link{padding:7px 16px;border-radius:8px;text-decoration:none;color:var(--muted);font-weight:500;font-size:.88rem;transition:all .2s;}
+        .nav-link:hover{background:var(--primary-light);color:var(--primary);}
+        .btn-logout{padding:7px 16px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;background:#fee2e2;color:#dc2626;transition:all .2s;}
+        .btn-logout:hover{background:#dc2626;color:#fff;}
+
+        .main{padding-top:calc(var(--navbar-h)+36px);padding-bottom:60px;max-width:900px;margin:0 auto;padding-left:24px;padding-right:24px;}
+
+        /* Page header */
+        .page-header{margin-bottom:24px;}
+        .page-header h1{font-size:1.5rem;font-weight:700;}
+        .page-header h1 span{color:var(--primary);}
+        .page-header p{color:var(--muted);font-size:.9rem;margin-top:4px;}
+
+        /* Alert */
+        .alert{padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:.9rem;display:flex;align-items:center;gap:8px;background:#dcfce7;color:#16a34a;}
+
+        /* Appointment cards */
+        .appt-list{display:flex;flex-direction:column;gap:14px;}
+        .appt-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;display:flex;align-items:center;gap:18px;transition:box-shadow .2s;}
+        .appt-card:hover{box-shadow:0 8px 32px rgba(37,99,235,.14);}
+
+        .appt-date{min-width:70px;text-align:center;background:linear-gradient(135deg,#1e40af,#06b6d4);border-radius:12px;padding:10px 8px;color:#fff;}
+        .appt-date .day{font-size:1.6rem;font-weight:700;line-height:1;}
+        .appt-date .month{font-size:.7rem;font-weight:600;opacity:.85;margin-top:2px;}
+
+        .appt-info{flex:1;}
+        .appt-info h3{font-size:1rem;font-weight:700;color:var(--text);}
+        .appt-doctor-img{width:36px;height:36px;border-radius:8px;object-fit:cover;object-position:top;border:2px solid var(--border);}
+
+        .tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;}
+        .tag-dept{background:#f0fdf4;color:#15803d;}
+        .tag-specialty{background:var(--primary-light);color:var(--primary);}
+
+        /* Empty */
+        .empty{text-align:center;padding:60px 0;color:var(--muted);}
+        .empty i{font-size:4rem;color:#cbd5e1;margin-bottom:16px;}
+        .empty a{display:inline-block;margin-top:20px;padding:10px 24px;background:var(--primary);color:#fff;border-radius:10px;text-decoration:none;font-weight:600;transition:opacity .2s;}
+        .empty a:hover{opacity:.85;}
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/home}">
+        <i class="fa-solid fa-stethoscope"></i> ClinicCare
+    </a>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <a class="nav-link" th:href="@{/home}"><i class="fa fa-home"></i> Trang chủ</a>
+        <a class="nav-link" th:href="@{/appointments/my}" style="background:var(--primary-light);color:var(--primary)">
+            <i class="fa fa-calendar-check"></i> Lịch của tôi
+        </a>
+        <form th:action="@{/logout}" method="post" style="display:inline">
+            <button class="btn-logout" type="submit"><i class="fa fa-right-from-bracket"></i> Đăng xuất</button>
+        </form>
+    </div>
+</nav>
+
+<div class="main">
+    <div class="page-header">
+        <h1>Lịch khám <span>của tôi</span></h1>
+        <p>Danh sách các cuộc hẹn bạn đã đặt</p>
+    </div>
+
+    <div class="alert" th:if="${param.success}">
+        <i class="fa fa-circle-check"></i> Đặt lịch thành công! Chúng tôi sẽ liên hệ xác nhận.
+    </div>
+
+    <!-- Có lịch -->
+    <div class="appt-list" th:if="${!appointments.isEmpty()}">
+        <div class="appt-card" th:each="appt : ${appointments}">
+            <!-- Ngày -->
+            <div class="appt-date">
+                <div class="day" th:text="${#temporals.format(appt.appointmentDate, 'dd')}">01</div>
+                <div class="month" th:text="${#temporals.format(appt.appointmentDate, 'MM/yyyy')}">03/2026</div>
+            </div>
+            <!-- Ảnh -->
+            <img class="appt-doctor-img"
+                 th:src="${appt.doctor.image != null and !appt.doctor.image.isEmpty()} ? ${appt.doctor.image} : 'https://i.pravatar.cc/100?u=' + ${appt.doctor.id}"
+                 th:alt="${appt.doctor.name}"/>
+            <!-- Info -->
+            <div class="appt-info">
+                <h3 th:text="${appt.doctor.name}">Tên bác sĩ</h3>
+                <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+                    <span class="tag tag-specialty"
+                          th:text="${appt.doctor.specialty ?: '—'}"></span>
+                    <span class="tag tag-dept"
+                          th:text="${appt.doctor.department != null ? appt.doctor.department.name : '—'}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Không có lịch -->
+    <div class="empty" th:if="${appointments.isEmpty()}">
+        <i class="fa-regular fa-calendar-xmark"></i>
+        <p>Bạn chưa có lịch khám nào.</p>
+        <a th:href="@{/home}"><i class="fa fa-search"></i> Tìm bác sĩ để đặt lịch</a>
+    </div>
+</div>
+</body>
+</html>
