@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ hàng - B8 Premium Store</title>
+</head>
+<body>
+<div th:replace="~{layout :: html(content=~{::div.container})}">
+    <div class="container py-5 animate-fade-in">
+        <h2 class="fw-800 mb-5 text-uppercase tracking-tighter" style="font-size: 2.2rem;">Your <span class="text-primary">Shopping Bag</span></h2>
+
+        <div th:if="${cartItems.empty}" class="glass-form text-center py-5 rounded-5 border-dashed border-white-25">
+            <div class="mb-4 d-inline-flex p-4 rounded-circle" style="background: rgba(255,255,255,0.05);">
+                <i class="fas fa-shopping-basket fa-4x text-white-25"></i>
+            </div>
+            <h4 class="fw-bold text-white-50">YOUR BAG IS EMPTY</h4>
+            <p class="text-white-25 mb-4">You haven't added any premium tech to your collection yet.</p>
+            <a href="/products" class="btn btn-premium px-5 py-3 rounded-pill">DISCOVER PRODUCTS</a>
+        </div>
+
+        <div th:if="${!cartItems.empty}" class="row g-5">
+            <div class="col-lg-8">
+                <div class="glass-form p-0 border-0 shadow-lg rounded-5 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 text-white border-0">
+                            <thead style="background: rgba(255,255,255,0.02);">
+                                <tr>
+                                    <th class="ps-4 py-4 border-0 text-white-50 small fw-bold tracking-widest text-uppercase">TECH PRODUCT</th>
+                                    <th class="py-4 border-0 text-white-50 small fw-bold tracking-widest text-uppercase text-center">QUANTITY</th>
+                                    <th class="py-4 border-0 text-white-50 small fw-bold tracking-widest text-uppercase text-end">TOTAL</th>
+                                    <th class="pe-4 py-4 border-0 text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${cartItems}" class="border-0 hover-highlight" style="transition: var(--transition);">
+                                    <td class="ps-4 py-4 border-0">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-4 overflow-hidden me-3" style="width: 80px; height: 80px; border: 1px solid var(--surface-border);">
+                                                <img th:src="${item.image != null && item.image != '' ? item.image : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800&auto=format&fit=crop'}" 
+                                                     class="w-100 h-100" style="object-fit: cover;">
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1" th:text="${item.productName}">Product Name</h6>
+                                                <span class="text-primary small fw-semibold" th:text="'Unit: ' + ${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center py-4 border-0">
+                                        <div class="d-inline-flex align-items-center bg-dark bg-opacity-25 rounded-pill px-3 py-1 border border-white border-opacity-10">
+                                            <span class="fs-6 fw-bold px-2" th:text="${item.quantity}">1</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-end py-4 border-0">
+                                        <span class="fw-800 text-white fs-6" th:text="${#numbers.formatDecimal(item.subtotal, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                                    </td>
+                                    <td class="pe-4 py-4 border-0 text-center">
+                                        <form th:action="@{/cart/remove/{id}(id=${item.productId})}" method="post">
+                                            <button type="submit" class="btn btn-link text-white-25 hover-danger p-2" style="transition: 0.2s;">
+                                                <i class="fas fa-trash-alt fs-5"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="/products" class="btn btn-outline-light rounded-pill border-0 d-inline-flex align-items-center gap-2 px-4 py-2 hover-slide op-75">
+                        <i class="fas fa-arrow-left"></i> CONTINUE SHOPPING
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="glass-form p-4 rounded-5 border-0 shadow-2xl position-sticky" style="top: 100px;">
+                    <h5 class="fw-bold mb-4 pb-3 border-bottom border-white border-opacity-10">ORDER SUMMARY</h5>
+                    
+                    <div class="d-flex justify-content-between mb-3 text-white-50">
+                        <span>Items Subtotal</span>
+                        <span th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-4 text-white-50">
+                        <span>Shipping Fee</span>
+                        <span class="text-success small fw-bold">FREE SHIPPING</span>
+                    </div>
+                    
+                    <hr class="mb-4 opacity-10">
+                    
+                    <div class="d-flex justify-content-between align-items-end mb-4">
+                        <span class="fw-bold text-white-50">TOTAL AMOUNT</span>
+                        <h3 class="fw-900 text-white mb-0" th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></h3>
+                    </div>
+                    
+                    <a href="/checkout" class="btn btn-premium w-100 py-3 rounded-pill fs-5 shadow-lg d-flex align-items-center justify-content-center gap-3">
+                        PROCEED TO CHECKOUT <i class="fas fa-arrow-right"></i>
+                    </a>
+                    
+                    <div class="mt-4 text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" height="12" class="mx-2 opacity-50 gray-scale" alt="Visa">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/800px-Mastercard-logo.svg.png" height="20" class="mx-2 opacity-50 gray-scale" alt="Master">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/1200px-PayPal.svg.png" height="15" class="mx-2 opacity-50 gray-scale" alt="Paypal">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-highlight:hover { background: rgba(255,255,255,0.03); }
+    .hover-danger:hover { color: var(--accent) !important; transform: scale(1.1); }
+    .gray-scale { filter: grayscale(1) brightness(2); }
+</style>
+</body>
+</html>

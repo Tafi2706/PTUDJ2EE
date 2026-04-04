@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sản Phẩm - B8 Premium Store</title>
+</head>
+<body>
+<div th:replace="~{layout :: html(content=~{::div.container-fluid})}">
+    <div class="container-fluid py-4 px-lg-5">
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-4">
+            <div>
+                <h1 class="fw-800 mb-1" style="font-size: 2.5rem; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DISCOVER TECH</h1>
+                <p class="text-white-50 mb-0"><i class="fas fa-sparkles text-primary me-2"></i>Explore our curated collection of high-end gadgets.</p>
+            </div>
+            
+            <div class="glass-form p-3 border-0 shadow-sm rounded-pill" style="max-width: 800px; width: 100%;">
+                <form th:action="@{/products}" method="get" class="row g-2 align-items-center">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-0 text-white-50"><i class="fas fa-search"></i></span>
+                            <input type="text" name="keyword" class="form-control border-0 shadow-none ps-0" placeholder="Search products..." th:value="${keyword}">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="categoryId" class="form-select bg-transparent border-0 shadow-none text-white-50" style="cursor: pointer;">
+                            <option value="" class="bg-dark">All Categories</option>
+                            <option th:each="cat : ${categories}" 
+                                    th:value="${cat.id}" 
+                                    th:text="${cat.name}"
+                                    th:selected="${cat.id == categoryId}"
+                                    class="bg-dark"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="sortDir" class="form-select bg-transparent border-0 shadow-none text-white-50" style="cursor: pointer;">
+                            <option value="asc" th:selected="${sortDir == 'asc'}" class="bg-dark">Price: Low to High</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}" class="bg-dark">Price: High to Low</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-premium rounded-pill py-2">APPLY</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible animate-fade-in border-0 rounded-4 px-4 py-3 mb-5 d-flex align-items-center" style="background: rgba(16,185,129,0.1); color: #10b981;">
+            <i class="fas fa-check-circle me-3 fs-4"></i>
+            <span class="fw-semibold" th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-5 g-4 mb-5">
+            <div class="col" th:each="product : ${products}">
+                <div class="product-card h-100 d-flex flex-column">
+                    <div class="product-img-wrapper">
+                        <img th:src="${product.image != null && product.image != '' ? product.image : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800&auto=format&fit=crop'}" alt="Product Image">
+                        <div class="position-absolute top-0 end-0 p-3">
+                            <span class="badge-category small" th:text="${product.category.name}">Category</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-4 d-flex flex-column">
+                        <h5 class="fw-bold mb-2 text-truncate" th:text="${product.name}">Product Name</h5>
+                        <p class="small text-white-50 mb-3 text-truncate" th:text="${product.description}">Description...</p>
+                        
+                        <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top border-white border-opacity-10">
+                            <span class="price-tag" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                            
+                            <form th:action="@{/cart/add}" method="post" class="d-flex align-items-center gap-2">
+                                <input type="hidden" name="productId" th:value="${product.id}">
+                                <input type="number" name="quantity" class="form-control text-center p-1" value="1" min="1" max="10" style="width: 45px; height: 36px; font-size: 0.8rem;">
+                                <button class="btn btn-premium p-0 d-flex align-items-center justify-content-center" type="submit" style="width: 36px; height: 36px; border-radius: 10px;">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div th:if="${products.empty}" class="text-center py-5 glass-form border-dashed mb-5">
+            <i class="fas fa-box-open fa-4x text-white-25 mb-4 d-block"></i>
+            <h3 class="fw-bold">No Products Found</h3>
+            <p class="text-white-50">Try adjusting your filters or search keywords.</p>
+            <a href="/products" class="btn btn-outline-light rounded-pill px-4 mt-3">Reset Filters</a>
+        </div>
+
+        <!-- Pagination -->
+        <nav th:if="${totalPages > 1}" class="mt-5 animate-fade-in" aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                    <a class="page-link py-2 px-3" th:href="@{/products(page=${currentPage - 1}, keyword=${keyword}, categoryId=${categoryId}, sortDir=${sortDir})}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                
+                <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link py-2 px-4 fw-bold" th:href="@{/products(page=${i}, keyword=${keyword}, categoryId=${categoryId}, sortDir=${sortDir})}" th:text="${i}">1</a>
+                </li>
+                
+                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                    <a class="page-link py-2 px-3" th:href="@{/products(page=${currentPage + 1}, keyword=${keyword}, categoryId=${categoryId}, sortDir=${sortDir})}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>
